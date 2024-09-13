@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Database Viewer</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    label, select, button {
+        margin: 10px 0;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    li {
+        background-color: #f0f0f0;
+        margin: 5px 0;
+        padding: 10px;
+        border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Movie Database Viewer</h1>
+
+<!-- Dropdown to select the database -->
+<label for="database-select">Select a Database:</label>
+<select id="database-select">
+  <option value="">-- Select a Database --</option>
+</select>
+<button id="switch-db">Switch Database</button>
+
+<!-- Display movie list -->
+<h2>Movies:</h2>
+<ul id="movie-list"></ul>
+
+<script>
+  const dbSelect = document.getElementById('database-select');
+  const movieList = document.getElementById('movie-list');
+  const switchDbButton = document.getElementById('switch-db');
+
+  // Fetch the list of available databases and populate the dropdown
+  function fetchDatabases() {
+      fetch('http://localhost:9999/api/database')
+          .then(response => response.json())
+          .then(data => {
+              data.forEach(db => {
+                  const option = document.createElement('option');
+                  option.value = db.value;
+                  option.textContent = db.key;
+                  dbSelect.appendChild(option);
+              });
+          })
+          .catch(error => console.error('Error fetching databases:', error));
+  }
+
+  // Fetch and display movies from the selected database
+  function fetchMovies() {
+      fetch('http://localhost:9999/api/movies')
+          .then(response => response.json())
+          .then(movies => {
+              movieList.innerHTML = '';
+              movies.forEach(movie => {
+                  const li = document.createElement('li');
+                  li.innerHTML = `<strong>${movie.name}</strong> (${movie.length})<br>${movie.info}`;
+                  movieList.appendChild(li);
+              });
+          })
+          .catch(error => console.error('Error fetching movies:', error));
+  }
+
+  // Switch the database when a new one is selected
+  function switchDatabase() {
+      const selectedDb = dbSelect.value;
+      if (!selectedDb) {
+          alert('Please select a database.');
+          return;
+      }
+
+      fetch(`http://localhost:9999/api/database/change?dbKey=${selectedDb}`, { method: 'POST' })
+          .then(response => response.text())
+          .then(message => {
+              console.log(message);
+              fetchMovies(); // Fetch movies after switching the database
+          })
+          .catch(error => console.error('Error switching database:', error));
+  }
+
+  // Load databases on page load
+  fetchDatabases();
+
+  // Set up event listeners
+  switchDbButton.addEventListener('click', switchDatabase);
+
+</script>
+
+</body>
+</html>
