@@ -9,6 +9,10 @@ import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
+
+/**
+ * Set and store database configuration in the application context.
+ */
 @Slf4j
 @Component
 public class ContextSettingWebFilter implements WebFilter {
