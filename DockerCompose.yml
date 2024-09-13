@@ -1,0 +1,25 @@
+services:
+
+  demodb:
+    image: postgres:16-alpine
+    container_name: demodb
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: comedy
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - demo-db:/var/lib/postgresql/data
+      - ./imports/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - demo-network
+
+
+networks:
+  demo-network:
+    driver: bridge
+
+volumes:
+  demo-db:
